@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Nachocase</title>
+	<style>
+		form { display: inline; }
+		.volume { width: 30px }
+	</style>
+</head>
+<body>
+
+<form id="queue-form">
+	<input type="text" name="url" class="url" placeholder="URL">
+	<br>
+	<label><input type="radio" name="type" value="youtube" checked> YouTube</label>
+	<label><input type="radio" name="type" value="vimeo"> Vimeo</label>
+	<label><input type="radio" name="type" value="soundcloud"> SoundCloud</label>
+	<br>
+	<button type="submit">Queue</button>
+</form>
+
+<hr>
+
+<span class="time"></span>
+<button class="play">Play</button>
+<button class="pause">Pause</button>
+<button class="skip">Skip</button>
+
+<form id="volume-form" action="#">
+	<input type="text" value="100" class="volume">
+	<button type="submit">Volume</button>
+</form>
+
+<div class="queue">
+	<h4>Queue</h4>
+</div>
+
+<div class="events">
+	<h4>Events</h4>
+</div>
+
+<script src="./require.js"></script>
+<script>
+	require(
+			['../nacho'],
+			function (Nacho) {
+				var nacho = new Nacho(),
+					urlInput = document.querySelector('.url'),
+					volumeInput = document.querySelector('.volume')
+					queueContainer = document.querySelector('.queue'),
+					eventsContainer = document.querySelector('.events');
+
+				document.querySelector('#queue-form').addEventListener('submit', function (e) {
+					var type = document.querySelector('[name=type]:checked').value,
+						url = urlInput.value;
+					urlInput.value = '';
+					e.preventDefault();
+
+					nacho.queue(type, url);
+
+					var item = document.createElement('div');
+					item.textContent = url;
+					queueContainer.appendChild(item);
+				});
+
+				document.querySelector('.play').addEventListener('click', function () {
+					nacho.play();
+				});
+				document.querySelector('.pause').addEventListener('click', function () {
+					nacho.pause();
+				});
+				document.querySelector('.skip').addEventListener('click', function () {
+					nacho.skip();
+				});
+
+				document.querySelector('#volume-form').addEventListener('submit', function (e) {
+					e.preventDefault();
+					nacho.setVolume(volumeInput.value / 100);
+				});
+
+				nacho.on('finish skip', function () {
+					var items = queueContainer.querySelectorAll('.item');
+
+					if (items.length == 0) return;
+
+					items[0].remove();
+
+					if (items[1]) items[1].classList.add('active');
+				});
+
+				nacho.on('all', function(event) {
+					var el = document.createElement('div');
+					el.textContent = JSON.stringify(event);
+					eventsContainer.insertBefore(el);
+				});
+			}
+	);
+</script>
+</body>
+</html>
