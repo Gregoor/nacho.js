@@ -35,7 +35,12 @@ define(
 				this._player.setVolume(volume);
 			},
 			on: function(eventName, callback) {
-				this._player.bind(eventName, callback);
+				var self = this;
+				this._player.bind(eventName, function(e) {
+					self._player.getPosition(function(position) {
+						callback({type: eventName, position: position / 1000});
+					});
+				});
 			},
 			remove: function() {
 				this._element.remove();

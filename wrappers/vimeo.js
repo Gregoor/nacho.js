@@ -28,7 +28,10 @@ define(
 				this._player.api('setVolume', volume);
 			},
 			on: function(eventName, callback) {
-				this._player.addEvent(eventName	, callback);
+				var self = this;
+				this._player.addEvent(eventName, function(e) {
+					callback({type: eventName, position: self._player.api('getCurrentTime')});
+				});
 			},
 			remove: function() {
 				this._element.remove();
