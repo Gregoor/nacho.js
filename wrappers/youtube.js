@@ -7,7 +7,7 @@ define(
 
 			this._element = document.createElement('div');
 			this._element.id = id;
-//			this._element.style.display = 'none';
+			this._element.style.display = 'none';
 			document.body.appendChild(this._element);
 
 			this._player = new YT.Player(id, {
@@ -39,7 +39,7 @@ define(
 
 				if (eventCode !== undefined) this._player.addEventListener('onStateChange', function(e) {
 					if (e.data == eventCode) {
-						callback({ type: eventName, position: self._player.getCurrentTime() });
+						callback({type: eventName, position: self._player.getCurrentTime()});
 					}
 				});
 				else if(eventName == 'ready') this._player.addEventListener('onReady', function() {
@@ -47,7 +47,7 @@ define(
 				});
 			},
 			remove: function() {
-				this._player.destroy();
+				this._player.getIframe().remove();
 				this._element.remove();
 			},
 			_player: null,

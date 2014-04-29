@@ -2,7 +2,10 @@ define(
 	['./wrappers/youtube', './wrappers/vimeo', './wrappers/soundcloud'],
 	function(YouTube, Vimeo, SoundCloud) {
 		var Nacho = function(videoContainer) {
-			this.on('finish', this.skip);
+			var self = this;
+			this.on('finish', function() {
+				self.skip();
+			});
 		};
 		var allEvents = ['play', 'pause', 'seek', 'skip', 'finish'];
 
@@ -10,7 +13,7 @@ define(
 			isPlaying: true,
 			volume: 1,
 			queue: function(type, url) {
-				this._queue.push({type: type, url: url});
+				this._queue.push({type: encodeURI(type), url: url});
 				if (this._player == null) this.skip();
 
 				return this;
@@ -68,8 +71,9 @@ define(
 					for (var i = 0; i < allEvents.length; i++) {
 						this.on(allEvents[i], callback);
 					}
-				} else if (events.length == 1) {
-					if (this._player && eventName != 'skip') this._player.on(eventName, callback);
+				} else if (eventName == 'skip') this._skipListeners.push(callback);
+				else if (events.length == 1) {
+					if (this._player) this._player.on(eventName, callback);
 
 					if (!this._listeners[eventName]) this._listeners[eventName] = [];
 					this._listeners[eventName].push(callback);
@@ -78,18 +82,17 @@ define(
 				return this;
 			},
 			trigger: function(eventName) {
-				var listeners = this._listeners[eventName];
+				var listeners = eventName == 'skip' ? this._skipListeners : this._listeners[eventName];
 				if (listeners) for (var i = 0; i < listeners.length; i++) listeners[i]({type: eventName});
 			},
 			_player: null,
 			_queue: [],
 			_listeners: {},
+			_skipListeners: [],
 			_attachListeners: function() {
 				for (var eventName in this._listeners) {
 					var callbacks = this._listeners[eventName];
-					for (var i = 0; i < callbacks.length; i++) if (callbacks[i] != 'skip') {
-						this._player.on(eventName, callbacks[i]);
-					}
+					for (var i = 0; i < callbacks.length; i++) this._player.on(eventName, callbacks[i]);
 				}
 			}
 		};

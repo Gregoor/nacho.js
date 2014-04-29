@@ -2,16 +2,25 @@ define(
 	['./players/vimeo'],
 	function() {
 		var Vimeo = function(videoId) {
-			var id = 'vimeo-' + Math.round(Math.random() * 100000),
+			var self = this,
+				id = 'vimeo-' + Math.round(Math.random() * 100000),
 				iframe = document.createElement('iframe');
 			iframe.id = id;
 			iframe.src = 'http://player.vimeo.com/video/' + videoId + '?api=1&player_id=' + id;
 
-//			iframe.style.display = 'none';
+			iframe.style.display = 'none';
 			document.body.appendChild(iframe);
 
 			this._player = $f(iframe);
 			this._element = iframe;
+			this._player.addEvent('ready', function() {
+				console.log(44, arguments)
+				self._isReady = true;
+				for (var eventName in self._unattachedListeners) {
+					var listeners = self._unattachedListeners[eventName];
+					for (var i = 0; i < listeners.length; i++) self.on(eventName, listeners[i]);
+				}
+			});
 		};
 
 		Vimeo.prototype = {
@@ -29,15 +38,22 @@ define(
 			},
 			on: function(eventName, callback) {
 				var self = this;
-				this._player.addEvent(eventName, function(e) {
-					callback({type: eventName, position: self._player.api('getCurrentTime')});
+				if (!this._isReady) {
+					if (!this._unattachedListeners[eventName]) this._unattachedListeners[eventName] = [];
+					this._unattachedListeners[eventName].push(callback);
+				} else this._player.addEvent(eventName, function(e) {
+					self._player.api('getCurrentTime', function(position) {
+						callback({type: eventName, position: position});
+					});
 				});
 			},
 			remove: function() {
 				this._element.remove();
 			},
+			_isReady: false,
 			_player: null,
-			_element: null
+			_element: null,
+			_unattachedListeners: {}
 		};
 
 		return Vimeo;

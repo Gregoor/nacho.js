@@ -14,7 +14,7 @@ define(
 				'&show_user=false' +
 				'&single_active=false';
 
-//			iframe.style.display = 'none';
+			iframe.style.display = 'none';
 			document.body.appendChild(iframe);
 
 			this._player = SC.Widget(iframe);
@@ -36,7 +36,10 @@ define(
 			},
 			on: function(eventName, callback) {
 				var self = this;
-				this._player.bind(eventName, function(e) {
+				if (eventName == 'finish') this._player.bind('playProgress', function(e) {
+					if (e.relativePosition == 1) callback({type: eventName});
+				});
+				else this._player.bind(eventName, function(e) {
 					self._player.getPosition(function(position) {
 						callback({type: eventName, position: position / 1000});
 					});
