@@ -1,12 +1,12 @@
 define(
 	['./players/vimeo'],
 	function() {
-		var Vimeo = function(videoId) {
+		var Vimeo = function(url) {
 			var self = this,
 				id = 'vimeo-' + Math.round(Math.random() * 100000),
 				iframe = document.createElement('iframe');
 			iframe.id = id;
-			iframe.src = 'http://player.vimeo.com/video/' + videoId + '?api=1&player_id=' + id;
+			iframe.src = 'http://player.vimeo.com/video/' + url.split('.com/')[1] + '?api=1&player_id=' + id;
 
 			iframe.style.display = 'none';
 			document.body.appendChild(iframe);

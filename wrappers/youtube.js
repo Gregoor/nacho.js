@@ -1,7 +1,7 @@
 define(
 	['./players/youtube'],
 	function() {
-		var YouTube = function(videoId) {
+		var YouTube = function(url) {
 			var self = this,
 				id = 'youtube-' + Math.round(Math.random() * 100000);
 
@@ -11,7 +11,7 @@ define(
 			document.body.appendChild(this._element);
 
 			this._player = new YT.Player(id, {
-				videoId: videoId
+				videoId: url.split('?v=')[1]
 			});
 
 		};
