@@ -65,6 +65,14 @@ define(
 				this.volume = volume;
 				if (this._player) this._player.setVolume(volume);
 			},
+			mute: function() {
+				this.prevVolume = this.prevVolume || this.volume;
+				this.setVolume(0);
+			},
+			unmute: function() {
+				this.setVolume(this.prevVolume);
+				this.prevVolume = null;
+			},
 			on: function(eventName, callback) {
 				var events = eventName.split(' ');
 				if (eventName == 'all') {
