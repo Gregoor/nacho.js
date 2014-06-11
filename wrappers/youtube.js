@@ -1,17 +1,24 @@
 define(
 	['./players/youtube'],
 	function() {
-		var YouTube = function(url) {
+		var YouTube = function(url, container) {
 			var self = this,
 				id = 'youtube-' + Math.round(Math.random() * 100000);
 
 			this._element = document.createElement('div');
 			this._element.id = id;
-			this._element.style.display = 'none';
-			document.body.appendChild(this._element);
+
+			if (container) container.appendChild(this._element)
+			else {
+				this._element.style.display = 'none';
+				document.body.appendChild(this._element);
+			}
 
 			this._player = new YT.Player(id, {
-				videoId: url.split('?v=')[1]
+				videoId: url.split('?v=')[1],
+				playerVars: {
+					controls: 0
+				}
 			});
 
 		};

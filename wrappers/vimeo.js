@@ -1,20 +1,22 @@
 define(
 	['./players/vimeo'],
 	function() {
-		var Vimeo = function(url) {
+		var Vimeo = function(url, container) {
 			var self = this,
 				id = 'vimeo-' + Math.round(Math.random() * 100000),
 				iframe = document.createElement('iframe');
 			iframe.id = id;
 			iframe.src = 'http://player.vimeo.com/video/' + url.split('.com/')[1] + '?api=1&player_id=' + id;
 
-			iframe.style.display = 'none';
-			document.body.appendChild(iframe);
+			if (container) container.appendChild(iframe)
+			else {
+				iframe.style.display = 'none';
+				document.body.appendChild(iframe);
+			}
 
 			this._player = $f(iframe);
 			this._element = iframe;
 			this._player.addEvent('ready', function() {
-				console.log(44, arguments)
 				self._isReady = true;
 				for (var eventName in self._unattachedListeners) {
 					var listeners = self._unattachedListeners[eventName];

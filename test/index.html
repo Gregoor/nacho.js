@@ -31,6 +31,10 @@
 	<button type="submit">Volume</button>
 </form>
 
+<div class="video">
+	<h4>Video</h4>
+</div>
+
 <div class="queue">
 	<h4>Queue</h4>
 </div>
@@ -44,9 +48,10 @@
 	require(
 			['../nacho'],
 			function (Nacho) {
-				var nacho = new Nacho(),
+				var nacho = new Nacho(document.querySelector('.video')),
 					urlInput = document.querySelector('.url'),
-					volumeInput = document.querySelector('.volume')
+					volumeInput = document.querySelector('.volume'),
+					timeLabel = document.querySelector('label.time'),
 					queueContainer = document.querySelector('.queue'),
 					eventsContainer = document.querySelector('.events');
 

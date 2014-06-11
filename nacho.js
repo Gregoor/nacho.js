@@ -1,8 +1,9 @@
 define(
 	['./wrappers/youtube', './wrappers/vimeo', './wrappers/soundcloud'],
 	function(YouTube, Vimeo, SoundCloud) {
-		var Nacho = function(videoContainer) {
+		var Nacho = function(container) {
 			var self = this;
+			this._container = container;
 			this.on('finish', function() {
 				self.skip();
 			});
@@ -18,15 +19,21 @@ define(
 
 				return this;
 			},
-			play: function() {
+			play: function(seconds) {
 				this.isPlaying = true;
-				if (this._player) this._player.play();
+				if (this._player) {
+					if (seconds !== undefined) this.seekTo(seconds);
+					this._player.play();
+				}
 
 				return this;
 			},
-			pause: function() {
+			pause: function(seconds) {
 				this.isPlaying = false;
-				if (this._player) this._player.pause();
+				if (this._player) {
+					if (seconds !== undefined) this.seekTo(seconds);
+					this._player.pause();
+				}
 
 				return this;
 			},
@@ -36,9 +43,10 @@ define(
 				return this;
 			},
 			skip: function() {
-				this.trigger('skip');
-
-				if (this._player) this._player.remove();
+				if (this._player) {
+					this.trigger('skip');
+					this._player.remove();
+				}
 
 				var item = this._queue.pop();
 
@@ -47,7 +55,7 @@ define(
 						'youtube': YouTube,
 						'vimeo': Vimeo,
 						'soundcloud': SoundCloud
-					}[item.type](item.url);
+					}[item.type](item.url, this._container);
 
 					var self = this;
 					this._player.on('ready', function() {
@@ -93,6 +101,10 @@ define(
 				var listeners = eventName == 'skip' ? this._skipListeners : this._listeners[eventName];
 				if (listeners) for (var i = 0; i < listeners.length; i++) listeners[i]({type: eventName});
 			},
+			remove: function() {
+				if (this._player) this._player.remove();
+			},
+			_container: null,
 			_player: null,
 			_queue: [],
 			_listeners: {},

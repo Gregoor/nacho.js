@@ -28,6 +28,9 @@ define(
 			pause: function() {
 				this._player.pause();
 			},
+			getCurrentTime: function() {
+				return this._player.getPosition() / 1000;
+			},
 			seekTo: function(seconds) {
 				this.seekTo(1000 * seconds);
 			},
