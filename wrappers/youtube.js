@@ -1,7 +1,9 @@
 define(
-	['./players/youtube'],
-	function() {
+	['../lib/listenable.js', './players/youtube'],
+	function(Listenable) {
 		var YouTube = function(url, container) {
+			new Listenable(this);
+
 			var self = this,
 				id = 'youtube-' + Math.round(Math.random() * 100000);
 
@@ -21,9 +23,28 @@ define(
 				}
 			});
 
+			this._player.addEventListener('onReady', function() {
+				self.trigger('ready');
+			});
+
+			var events = {};
+			events[YT.PlayerState.PLAYING] = 'play';
+			events[YT.PlayerState.PAUSED] = 'pause';
+			events[YT.PlayerState.ENDED] = 'finish';
+			this._player.addEventListener('onStateChange', function(e) {
+				if (events[e.data]) self.trigger(events[e.data], self._player.getCurrentTime());
+			});
+
+			window.onYoutubePlayerReady = function(playerId) {
+				if (id == playerId) {
+					self.ready = true;
+					self.trigger('ready');
+				}
+			};
 		};
 
 		YouTube.prototype = {
+			ready: false,
 			play: function() {
 				this._player.playVideo();
 			},
@@ -35,23 +56,6 @@ define(
 			},
 			setVolume: function(volume) {
 				this._player.setVolume(100 * volume);
-			},
-			on: function(eventName, callback) {
-				var self = this,
-					eventCode = {
-						'play': YT.PlayerState.PLAYING,
-						'pause': YT.PlayerState.PAUSED,
-						'finish': YT.PlayerState.ENDED
-					}[eventName];
-
-				if (eventCode !== undefined) this._player.addEventListener('onStateChange', function(e) {
-					if (e.data == eventCode) {
-						callback({type: eventName, position: self._player.getCurrentTime()});
-					}
-				});
-				else if(eventName == 'ready') this._player.addEventListener('onReady', function() {
-					callback({type: eventName});
-				});
 			},
 			remove: function() {
 				this._player.getIframe().remove();

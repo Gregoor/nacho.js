@@ -1,14 +1,15 @@
 define(
-	['./wrappers/youtube', './wrappers/vimeo', './wrappers/soundcloud'],
-	function(YouTube, Vimeo, SoundCloud) {
+	['./lib/listenable.js', './wrappers/youtube', './wrappers/vimeo', './wrappers/soundcloud'],
+	function(Listenable, YouTube, Vimeo, SoundCloud) {
 		var Nacho = function(container) {
+			new Listenable(this);
+
 			var self = this;
 			this._container = container;
 			this.on('finish', function() {
 				self.skip();
 			});
 		};
-		var allEvents = ['play', 'pause', 'seek', 'skip', 'finish'];
 
 		Nacho.prototype = {
 			isPlaying: true,
@@ -59,7 +60,7 @@ define(
 
 					var self = this;
 					this._player.on('ready', function() {
-						self._attachListeners();
+						self._player.on(self.forkListeners('play', 'pause', 'seek', 'finish'));
 						if (self.isPlaying) self._player.play();
 						else self._player.pause();
 
@@ -81,40 +82,12 @@ define(
 				this.setVolume(this.prevVolume);
 				this.prevVolume = null;
 			},
-			on: function(eventName, callback) {
-				var events = eventName.split(' ');
-				if (eventName == 'all') {
-					for (var i = 0; i < allEvents.length; i++) {
-						this.on(allEvents[i], callback);
-					}
-				} else if (eventName == 'skip') this._skipListeners.push(callback);
-				else if (events.length == 1) {
-					if (this._player) this._player.on(eventName, callback);
-
-					if (!this._listeners[eventName]) this._listeners[eventName] = [];
-					this._listeners[eventName].push(callback);
-				} else for (var i = 0; i < events.length; i++) this.on(events[i], callback);
-
-				return this;
-			},
-			trigger: function(eventName) {
-				var listeners = eventName == 'skip' ? this._skipListeners : this._listeners[eventName];
-				if (listeners) for (var i = 0; i < listeners.length; i++) listeners[i]({type: eventName});
-			},
 			remove: function() {
 				if (this._player) this._player.remove();
 			},
 			_container: null,
 			_player: null,
-			_queue: [],
-			_listeners: {},
-			_skipListeners: [],
-			_attachListeners: function() {
-				for (var eventName in this._listeners) {
-					var callbacks = this._listeners[eventName];
-					for (var i = 0; i < callbacks.length; i++) this._player.on(eventName, callbacks[i]);
-				}
-			}
+			_queue: []
 		};
 
 		return Nacho;

@@ -1,7 +1,9 @@
 define(
-	['./players/vimeo'],
-	function() {
+	['../lib/listenable.js', './players/vimeo'],
+	function(Listenable) {
 		var Vimeo = function(url, container) {
+			new Listenable(this);
+
 			var self = this,
 				id = 'vimeo-' + Math.round(Math.random() * 100000),
 				iframe = document.createElement('iframe');

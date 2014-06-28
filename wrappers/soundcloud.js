@@ -1,7 +1,9 @@
 define(
-	['./players/soundcloud'],
-	function() {
+	['../lib/listenable.js', './players/soundcloud'],
+	function(Listenable) {
 		var SoundCloud = function(url) {
+			new Listenable(this);
+
 			var iframe = document.createElement('iframe');
 			iframe.id = 'soundcloud-' + Math.round(Math.random() * 100000);
 			iframe.src = 'https://w.soundcloud.com/player?url=' + url +
