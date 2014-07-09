@@ -1,5 +1,5 @@
 define(
-	['../lib/listenable.js', './players/youtube'],
+	['./lib/listenable', './players/youtube'],
 	function(Listenable) {
 		var YouTube = function(url, container) {
 			new Listenable(this);

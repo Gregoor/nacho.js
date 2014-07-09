@@ -1,5 +1,5 @@
 define(
-	['../lib/listenable.js', './players/soundcloud'],
+	['./lib/listenable', './players/soundcloud'],
 	function(Listenable) {
 		var SoundCloud = function(url) {
 			new Listenable(this);

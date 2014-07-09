@@ -1,5 +1,5 @@
 define(
-	['./lib/listenable.js', './wrappers/youtube', './wrappers/vimeo', './wrappers/soundcloud'],
+	['./src/lib/listenable', './src/youtube', './src/vimeo', './src/soundcloud'],
 	function(Listenable, YouTube, Vimeo, SoundCloud) {
 		var Nacho = function(container) {
 			new Listenable(this);
