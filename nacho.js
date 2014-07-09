@@ -4,16 +4,19 @@ define(
 		var Nacho = function(container) {
 			new Listenable(this);
 
-			var self = this;
+			this.isPlaying = true;
+			this.volume = 1;
 			this._container = container;
+			this._player = null;
+			this._queue = [];
+
+			var self = this;
 			this.on('finish', function() {
 				self.skip();
 			});
 		};
 
 		Nacho.prototype = {
-			isPlaying: true,
-			volume: 1,
 			queue: function(type, url) {
 				this._queue.push({type: encodeURI(type), url: url});
 				if (this._player == null) this.skip();
@@ -60,7 +63,9 @@ define(
 
 					var self = this;
 					this._player.on('ready', function() {
-						self._player.on(self.forkListeners('play', 'pause', 'seek', 'finish'));
+						self._player.on('all', function(eventName) {
+							self.trigger(eventName, Array.prototype.slice.call(arguments, 1));
+						});
 						if (self.isPlaying) self._player.play();
 						else self._player.pause();
 
@@ -84,10 +89,7 @@ define(
 			},
 			remove: function() {
 				if (this._player) this._player.remove();
-			},
-			_container: null,
-			_player: null,
-			_queue: []
+			}
 		};
 
 		return Nacho;

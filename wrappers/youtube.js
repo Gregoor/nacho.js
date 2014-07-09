@@ -60,9 +60,7 @@ define(
 			remove: function() {
 				this._player.getIframe().remove();
 				this._element.remove();
-			},
-			_player: null,
-			_element: null
+			}
 		};
 
 		return YouTube;

@@ -93,9 +93,9 @@
 					if (items[1]) items[1].classList.add('active');
 				});
 
-				nacho.on('all', function(event) {
+				nacho.on('all', function(event, arg) {
 					var el = document.createElement('div');
-					el.textContent = JSON.stringify(event);
+					el.textContent = event + " - " + arg;
 					eventsContainer.insertBefore(el);
 				});
 			}

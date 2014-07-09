@@ -18,6 +18,9 @@ define(
 
 			this._player = $f(iframe);
 			this._element = iframe;
+			this._isReady = false;
+			this._unattachedListeners = {};
+
 			this._player.addEvent('ready', function() {
 				self._isReady = true;
 				for (var eventName in self._unattachedListeners) {
@@ -53,11 +56,7 @@ define(
 			},
 			remove: function() {
 				this._element.remove();
-			},
-			_isReady: false,
-			_player: null,
-			_element: null,
-			_unattachedListeners: {}
+			}
 		};
 
 		return Vimeo;

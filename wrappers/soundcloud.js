@@ -52,9 +52,7 @@ define(
 			},
 			remove: function() {
 				this._element.remove();
-			},
-			_player: null,
-			_element: null
+			}
 		};
 
 		return SoundCloud;
