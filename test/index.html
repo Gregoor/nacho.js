@@ -5,6 +5,7 @@
 	<style>
 		form { display: inline; }
 		.volume { width: 30px }
+		.events { height: 100px; overflow-y: scroll; }
 	</style>
 </head>
 <body>
@@ -39,8 +40,9 @@
 	<h4>Queue</h4>
 </div>
 
-<div class="events">
+<div class="event-container">
 	<h4>Events</h4>
+	<div class="events"></div>
 </div>
 
 <script src="./require.js"></script>
@@ -94,9 +96,11 @@
 				});
 
 				nacho.on('all', function(event, arg) {
-					var el = document.createElement('div');
+					var el = document.createElement('div'),
+						child = eventsContainer.querySelector('div');
 					el.textContent = event + " - " + arg;
-					eventsContainer.insertBefore(el);
+					if (child == null) eventsContainer.appendChild(el);
+					else eventsContainer.insertBefore(el, child);
 				});
 			}
 	);
