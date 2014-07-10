@@ -6,8 +6,10 @@ define(
 
 			this.isPlaying = true;
 			this.volume = 1;
+			this.seekTime = 0;
 			this._container = container;
 			this._player = null;
+			this._playerReady = false;
 			this._queue = [];
 
 			var self = this;
@@ -25,7 +27,7 @@ define(
 			},
 			play: function(seconds) {
 				this.isPlaying = true;
-				if (this._player) {
+				if (this._playerReady) {
 					if (seconds !== undefined) this.seekTo(seconds);
 					this._player.play();
 				}
@@ -34,7 +36,7 @@ define(
 			},
 			pause: function(seconds) {
 				this.isPlaying = false;
-				if (this._player) {
+				if (this._playerReady) {
 					if (seconds !== undefined) this.seekTo(seconds);
 					this._player.pause();
 				}
@@ -42,7 +44,8 @@ define(
 				return this;
 			},
 			seekTo: function(seconds) {
-				if (this._player) this._player.seekTo(seconds);
+				this.seekTime = seconds;
+				if (this._playerReady) this._player.seekTo(seconds);
 
 				return this;
 			},
@@ -54,30 +57,14 @@ define(
 
 				var item = this._queue.pop();
 
-				if (item) {
-					this._player = new {
-						'youtube': YouTube,
-						'vimeo': Vimeo,
-						'soundcloud': SoundCloud
-					}[item.type](item.url, this._container);
-
-					var self = this;
-					this._player.on('ready', function() {
-						self._player.on('all', function(eventName) {
-							self.trigger(eventName, Array.prototype.slice.call(arguments, 1));
-						});
-						if (self.isPlaying) self._player.play();
-						else self._player.pause();
-
-						self._player.setVolume(self.volume);
-					});
-				} else this._player = null;
+				if (item) this._createPlayer(item);
+				else this._player = null;
 
 				return this;
 			},
 			setVolume: function(volume) {
 				this.volume = volume;
-				if (this._player) this._player.setVolume(volume);
+				if (this._playerReady) this._player.setVolume(volume);
 			},
 			mute: function() {
 				this.prevVolume = this.prevVolume || this.volume;
@@ -88,7 +75,35 @@ define(
 				this.prevVolume = null;
 			},
 			remove: function() {
-				if (this._player) this._player.remove();
+				if (this._playerReady) this._player.remove();
+			},
+			_createPlayer: function(item) {
+				var self = this;
+				this._player = new {
+					'youtube': YouTube,
+					'vimeo': Vimeo,
+					'soundcloud': SoundCloud
+				}[item.type](item.url, this._container);
+				this._playerReady = false;
+				this.seekTime = 0;
+
+				this._player.on('ready', function() {
+					self._initPlayer();
+				});
+			},
+			_initPlayer: function() {
+				var self = this;
+				this._playerReady = true;
+				this._player.on('all', function() {
+					self.trigger.apply(this, arguments);
+				});
+
+				this.seekTo(this.seekTime);
+
+				if (this.isPlaying) this._player.play();
+				else this._player.pause();
+
+				this._player.setVolume(this.volume);
 			}
 		};
 
