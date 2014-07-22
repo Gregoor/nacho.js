@@ -4,7 +4,7 @@ define(
 		var SoundCloud = function(url) {
 			new Listenable(this);
 
-			var iframe = document.createElement('iframe');
+			var self = this, iframe = document.createElement('iframe');
 			iframe.id = 'soundcloud-' + Math.round(Math.random() * 100000);
 			iframe.src = 'https://w.soundcloud.com/player?url=' + url +
 				'&show_artwork=false' +
@@ -21,6 +21,26 @@ define(
 
 			this._player = SC.Widget(iframe);
 			this._element = iframe;
+
+			this._player.bind('playProgress', function(e) {
+				self.trigger('finish');
+			});
+
+			['play', 'pause', 'seek', 'finish'].forEach(function(eventName) {
+				self._player.bind(eventName, function() {
+					self._player.getPosition(function(position) {
+						self.trigger(eventName, position / 1000);
+					});
+				});
+			});
+
+			var notReady = true;
+			self._player.bind('loadProgress', function() {
+				if (notReady) {
+					self.trigger('ready');
+					notReady = false;
+				}
+			});
 		};
 
 		SoundCloud.prototype = {
@@ -38,17 +58,6 @@ define(
 			},
 			setVolume: function(volume) {
 				this._player.setVolume(volume);
-			},
-			on: function(eventName, callback) {
-				var self = this;
-				if (eventName == 'finish') this._player.bind('playProgress', function(e) {
-					if (e.relativePosition == 1) callback({type: eventName});
-				});
-				else this._player.bind(eventName, function(e) {
-					self._player.getPosition(function(position) {
-						callback({type: eventName, position: position / 1000});
-					});
-				});
 			},
 			remove: function() {
 				this._element.remove();

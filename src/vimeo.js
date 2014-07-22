@@ -22,7 +22,7 @@ define(
 			this._unattachedListeners = {};
 
 			this._player.addEvent('ready', function() {
-				self._isReady = true;
+				selfb._isReady = true;
 				for (var eventName in self._unattachedListeners) {
 					var listeners = self._unattachedListeners[eventName];
 					for (var i = 0; i < listeners.length; i++) self.on(eventName, listeners[i]);
