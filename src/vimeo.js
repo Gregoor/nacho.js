@@ -10,7 +10,7 @@ define(
 			iframe.id = id;
 			iframe.src = 'http://player.vimeo.com/video/' + url.split('.com/')[1] + '?api=1&player_id=' + id;
 
-			if (container) container.appendChild(iframe)
+			if (container) container.appendChild(iframe);
 			else {
 				iframe.style.display = 'none';
 				document.body.appendChild(iframe);
@@ -18,15 +18,14 @@ define(
 
 			this._player = $f(iframe);
 			this._element = iframe;
-			this._isReady = false;
-			this._unattachedListeners = {};
 
-			this._player.addEvent('ready', function() {
-				selfb._isReady = true;
-				for (var eventName in self._unattachedListeners) {
-					var listeners = self._unattachedListeners[eventName];
-					for (var i = 0; i < listeners.length; i++) self.on(eventName, listeners[i]);
-				}
+			['play', 'pause', 'seek', 'ready', 'finish'].forEach(function(eventName) {
+				self._player.addEvent(eventName, function() {
+					if (eventName == 'ready') self.trigger(eventName);
+					self._player.api('getCurrentTime', function(position) {
+						self.trigger(eventName, position);
+					})
+				})
 			});
 		};
 
@@ -42,17 +41,6 @@ define(
 			},
 			setVolume: function(volume) {
 				this._player.api('setVolume', volume);
-			},
-			on: function(eventName, callback) {
-				var self = this;
-				if (!this._isReady) {
-					if (!this._unattachedListeners[eventName]) this._unattachedListeners[eventName] = [];
-					this._unattachedListeners[eventName].push(callback);
-				} else this._player.addEvent(eventName, function(e) {
-					self._player.api('getCurrentTime', function(position) {
-						callback({type: eventName, position: position});
-					});
-				});
 			},
 			remove: function() {
 				this._element.remove();

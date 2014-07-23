@@ -22,24 +22,20 @@ define(
 			this._player = SC.Widget(iframe);
 			this._element = iframe;
 
-			this._player.bind('playProgress', function(e) {
-				self.trigger('finish');
+			this._element.addEventListener('load', function() {
+				self.trigger('ready');
 			});
 
-			['play', 'pause', 'seek', 'finish'].forEach(function(eventName) {
+			this._player.bind('playProgress', function(e) {
+				if (e.relativePostion == 1) self.trigger('finish');
+			});
+
+			['play', 'pause', 'seek'].forEach(function(eventName) {
 				self._player.bind(eventName, function() {
 					self._player.getPosition(function(position) {
 						self.trigger(eventName, position / 1000);
 					});
 				});
-			});
-
-			var notReady = true;
-			self._player.bind('loadProgress', function() {
-				if (notReady) {
-					self.trigger('ready');
-					notReady = false;
-				}
 			});
 		};
 
@@ -54,7 +50,7 @@ define(
 				return this._player.getPosition() / 1000;
 			},
 			seekTo: function(seconds) {
-				this.seekTo(1000 * seconds);
+				this._player.seekTo(1000 * seconds);
 			},
 			setVolume: function(volume) {
 				this._player.setVolume(volume);
