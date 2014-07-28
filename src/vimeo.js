@@ -19,13 +19,15 @@ define(
 			this._player = $f(iframe);
 			this._element = iframe;
 
-			['play', 'pause', 'seek', 'ready', 'finish'].forEach(function(eventName) {
-				self._player.addEvent(eventName, function() {
-					if (eventName == 'ready') self.trigger(eventName);
-					self._player.api('getCurrentTime', function(position) {
-						self.trigger(eventName, position);
+			self._player.addEvent('ready', function() {
+				self.trigger('ready');
+				['play', 'pause', 'seek', 'finish'].forEach(function(eventName) {
+					self._player.addEvent(eventName, function() {
+						self._player.api('getCurrentTime', function(position) {
+							self.trigger(eventName, position);
+						})
 					})
-				})
+				});
 			});
 		};
 
