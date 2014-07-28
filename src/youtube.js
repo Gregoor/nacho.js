@@ -17,10 +17,7 @@ define(
 			}
 
 			this._player = new YT.Player(id, {
-				videoId: url.split('?v=')[1],
-				playerVars: {
-					controls: 0
-				}
+				videoId: url.split('?v=')[1]
 			});
 
 			this._player.addEventListener('onReady', function() {

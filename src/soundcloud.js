@@ -22,12 +22,8 @@ define(
 			this._player = SC.Widget(iframe);
 			this._element = iframe;
 
-			this._element.addEventListener('load', function() {
+			self._player.bind('ready', function() {
 				self.trigger('ready');
-			});
-
-			this._player.bind('playProgress', function(e) {
-				if (e.relativePosition == 1) self.trigger('finish');
 			});
 
 			['play', 'pause', 'seek'].forEach(function(eventName) {
@@ -37,11 +33,18 @@ define(
 					});
 				});
 			});
+
+			this._player.bind('playProgress', function(e) {
+				if (e.relativePosition == 1) self.trigger('finish');
+			});
 		};
 
 		SoundCloud.prototype = {
 			play: function() {
-				this._player.play();
+				var self = this;
+				setTimeout(function() {
+					self._player.play();
+				}, 500);
 			},
 			pause: function() {
 				this._player.pause();
