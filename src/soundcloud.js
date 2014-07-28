@@ -27,7 +27,7 @@ define(
 			});
 
 			this._player.bind('playProgress', function(e) {
-				if (e.relativePostion == 1) self.trigger('finish');
+				if (e.relativePosition == 1) self.trigger('finish');
 			});
 
 			['play', 'pause', 'seek'].forEach(function(eventName) {
