@@ -3,9 +3,18 @@
 <head>
 	<title>Nachocase</title>
 	<style>
-		form { display: inline; }
-		.volume { width: 30px }
-		.events { height: 100px; overflow-y: scroll; }
+		form {
+			display: inline;
+		}
+
+		.volume {
+			width: 30px
+		}
+
+		.events {
+			height: 100px;
+			overflow-y: scroll;
+		}
 	</style>
 </head>
 <body>
@@ -42,69 +51,64 @@
 
 <div class="event-container">
 	<h4>Events</h4>
+
 	<div class="events"></div>
 </div>
 
-<script src="https://w.soundcloud.com/player/api.js"></script>
-<script src="./require.js"></script>
+<script src="../nacho.js"></script>
 <script>
-	require(
-			['../nacho'],
-			function (Nacho) {
-				var nacho = new Nacho(document.querySelector('.video')),
-					urlInput = document.querySelector('.url'),
-					volumeInput = document.querySelector('.volume'),
-					timeLabel = document.querySelector('label.time'),
-					queueContainer = document.querySelector('.queue'),
-					eventsContainer = document.querySelector('.events');
+	var nacho = new Nacho(document.querySelector('.video')),
+			urlInput = document.querySelector('.url'),
+			volumeInput = document.querySelector('.volume'),
+			timeLabel = document.querySelector('label.time'),
+			queueContainer = document.querySelector('.queue'),
+			eventsContainer = document.querySelector('.events');
 
-				document.querySelector('#queue-form').addEventListener('submit', function (e) {
-					var type = document.querySelector('[name=type]:checked').value,
-						url = urlInput.value;
-					urlInput.value = '';
-					e.preventDefault();
+	document.querySelector('#queue-form').addEventListener('submit', function(e) {
+		var type = document.querySelector('[name=type]:checked').value,
+				url = urlInput.value;
+		urlInput.value = '';
+		e.preventDefault();
 
-					nacho.queue(type, url);
+		nacho.queue(type, url);
 
-					var item = document.createElement('div');
-					item.textContent = url;
-					queueContainer.appendChild(item);
-				});
+		var item = document.createElement('div');
+		item.textContent = url;
+		queueContainer.appendChild(item);
+	});
 
-				document.querySelector('.play').addEventListener('click', function () {
-					nacho.play();
-				});
-				document.querySelector('.pause').addEventListener('click', function () {
-					nacho.pause();
-				});
-				document.querySelector('.skip').addEventListener('click', function () {
-					nacho.skip();
-				});
+	document.querySelector('.play').addEventListener('click', function() {
+		nacho.play();
+	});
+	document.querySelector('.pause').addEventListener('click', function() {
+		nacho.pause();
+	});
+	document.querySelector('.skip').addEventListener('click', function() {
+		nacho.skip();
+	});
 
-				document.querySelector('#volume-form').addEventListener('submit', function (e) {
-					e.preventDefault();
-					nacho.setVolume(volumeInput.value / 100);
-				});
+	document.querySelector('#volume-form').addEventListener('submit', function(e) {
+		e.preventDefault();
+		nacho.setVolume(volumeInput.value / 100);
+	});
 
-				nacho.on('finish skip', function () {
-					var items = queueContainer.querySelectorAll('.item');
+	nacho.on('finish skip', function() {
+		var items = queueContainer.querySelectorAll('.item');
 
-					if (items.length == 0) return;
+		if (items.length == 0) return;
 
-					items[0].remove();
+		items[0].remove();
 
-					if (items[1]) items[1].classList.add('active');
-				});
+		if (items[1]) items[1].classList.add('active');
+	});
 
-				nacho.on('all', function(event, arg) {
-					var el = document.createElement('div'),
-						child = eventsContainer.querySelector('div');
-					el.textContent = event + " - " + arg;
-					if (child == null) eventsContainer.appendChild(el);
-					else eventsContainer.insertBefore(el, child);
-				});
-			}
-	);
+	nacho.on('all', function(event, arg) {
+		var el = document.createElement('div'),
+				child = eventsContainer.querySelector('div');
+		el.textContent = event + " - " + arg;
+		if (child == null) eventsContainer.appendChild(el);
+		else eventsContainer.insertBefore(el, child);
+	});
 </script>
 </body>
 </html>
