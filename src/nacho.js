@@ -62,7 +62,7 @@
 		}
 	};
 
-	var SoundCloud = function(url) {
+	var SoundCloud = function(url, container) {
 		new Listenable(this);
 
 		var self = this, iframe = document.createElement('iframe');
@@ -77,8 +77,11 @@
 			'&show_user=false' +
 			'&single_active=false';
 
-		iframe.style.display = 'none';
-		document.body.appendChild(iframe);
+		if (container) container.appendChild(iframe);
+		else {
+			iframe.style.display = 'none';
+			document.body.appendChild(iframe);
+		}
 
 		this._player = SC.Widget(iframe);
 		this._element = iframe;

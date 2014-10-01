@@ -6,5 +6,6 @@ gulp.task('default', function() {
 	gulp.src('src/**/*.js')
 		.pipe(uglify())
 		.pipe(concat('nacho.js'))
-		.pipe(gulp.dest('./'));
+		.pipe(gulp.dest('./'))
+		.pipe(gulp.dest('./test/'));
 });
