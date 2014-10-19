@@ -259,6 +259,7 @@
 			return this;
 		},
 		play: function(seconds) {
+			if (this.isPlaying && seconds === undefined) return;
 			this.isPlaying = true;
 			if (this._playerReady) {
 				if (seconds !== undefined) this.seekTo(seconds);
