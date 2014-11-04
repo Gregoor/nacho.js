@@ -67,15 +67,7 @@
 
 		var self = this, iframe = document.createElement('iframe');
 		iframe.id = 'soundcloud-' + Math.round(Math.random() * 100000);
-		iframe.src = 'https://w.soundcloud.com/player?url=' + url +
-			'&show_artwork=false' +
-			'&buying=false' +
-			'&liking=false' +
-			'&sharing=false' +
-			'&download=false' +
-			'&show_comments=false' +
-			'&show_user=false' +
-			'&single_active=false';
+		iframe.src = 'https://w.soundcloud.com/player?url=' + url;
 
 		if (container) container.appendChild(iframe);
 		else {
@@ -83,22 +75,23 @@
 			document.body.appendChild(iframe);
 		}
 
-		this._player = SC.Widget(iframe);
+		var player = this._player = SC.Widget(iframe);
 		this._element = iframe;
 
-		self._player.bind('ready', function() {
+		player.bind('ready', function() {
 			self.trigger('ready');
 		});
 
-		['play', 'pause', 'seek'].forEach(function(eventName) {
-			self._player.bind(eventName, function() {
-				self._player.getPosition(function(position) {
-					self.trigger(eventName, position / 1000);
+		['play', 'pause', 'seek', 'error'].forEach(function(eventName) {
+			player.bind(eventName, function() {
+				player.getPosition(function(position) {
+					self.trigger(eventName, eventName == 'error' ?
+						undefined : position / 1000);
 				});
 			});
 		});
 
-		this._player.bind('playProgress', function(e) {
+		player.bind('playProgress', function(e) {
 			if (e.relativePosition == 1) self.trigger('finish');
 		});
 	};
@@ -190,20 +183,24 @@
 			document.body.appendChild(this._element);
 		}
 
-		this._player = new YT.Player(id, {
+		var player = this._player = new YT.Player(id, {
 			videoId: url.split('?v=')[1]
 		});
 
-		this._player.addEventListener('onReady', function() {
+		player.addEventListener('onReady', function() {
 			self.trigger('ready');
+		});
+
+		player.addEventListener('onError', function() {
+			self.trigger('error');
 		});
 
 		var events = {};
 		events[YT.PlayerState.PLAYING] = 'play';
 		events[YT.PlayerState.PAUSED] = 'pause';
 		events[YT.PlayerState.ENDED] = 'finish';
-		this._player.addEventListener('onStateChange', function(e) {
-			if (events[e.data]) self.trigger(events[e.data], self._player.getCurrentTime());
+		player.addEventListener('onStateChange', function(e) {
+			if (events[e.data]) self.trigger(events[e.data], player.getCurrentTime());
 		});
 
 		window.onYoutubePlayerReady = function(playerId) {
