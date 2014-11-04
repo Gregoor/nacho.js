@@ -9,3 +9,7 @@ gulp.task('default', function() {
 		.pipe(gulp.dest('./'))
 		.pipe(gulp.dest('./test/'));
 });
+
+gulp.task('watch', function() {
+	gulp.watch(['src/*.js'], ['default']);
+});
