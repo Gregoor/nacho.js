@@ -84,6 +84,7 @@
 
 		['play', 'pause', 'seek', 'error'].forEach(function(eventName) {
 			player.bind(eventName, function() {
+				if (eventName == 'finish') triggerFinish();
 				player.getPosition(function(position) {
 					self.trigger(eventName, eventName == 'error' ?
 						undefined : position / 1000);
@@ -92,7 +93,10 @@
 		});
 
 		player.bind('playProgress', function(e) {
-			if (e.relativePosition == 1) self.trigger('finish');
+			if (e.relativePosition == 1) self._triggerFinish();
+		});
+		player.bind('finish', function() {
+			self._triggerFinish();
 		});
 	};
 
@@ -117,6 +121,10 @@
 		},
 		remove: function() {
 			this._element.remove();
+		},
+		_triggerFinish: function() {
+			if (!this._finishTriggered) this.trigger('finish');
+			this._finishTriggered = true;
 		}
 	};
 
