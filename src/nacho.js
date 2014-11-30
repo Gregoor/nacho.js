@@ -156,9 +156,6 @@
 				})
 			});
 		});
-		self._player.addEvent('playProgress', function() {
-			console.log(23, arguments)
-		});
 	};
 
 	Vimeo.prototype = {
