@@ -237,6 +237,7 @@
 			this._player.setVolume(100 * volume);
 		},
 		remove: function() {
+			clearInterval(this._detectInterval);
 			this._player.getIframe().remove();
 			this._element.remove();
 		},
