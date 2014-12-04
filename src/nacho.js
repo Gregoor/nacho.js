@@ -135,7 +135,7 @@
 			id = 'vimeo-' + Math.round(Math.random() * 100000),
 			iframe = document.createElement('iframe');
 		iframe.id = id;
-		iframe.src = 'http://player.vimeo.com/video/' + url.split('.com/')[1] + '?api=1&player_id=' + id;
+		iframe.src = 'https://player.vimeo.com/video/' + url.split('.com/')[1] + '?api=1&player_id=' + id;
 
 		if (container) container.appendChild(iframe);
 		else {
@@ -273,7 +273,10 @@
 
 	Nacho.prototype = {
 		queue: function(type, url) {
-			this._queue.push({type: encodeURI(type), url: url});
+			this._queue.push({
+				'type': encodeURI(type),
+				'url': url.replace(/^http:\/\//i, 'https://')
+			});
 			if (this._player == null) this.skip();
 
 			return this;
