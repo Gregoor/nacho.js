@@ -67,7 +67,7 @@
 
 		var self = this, iframe = document.createElement('iframe');
 		iframe.id = 'soundcloud-' + Math.round(Math.random() * 100000);
-		iframe.src = 'https://w.soundcloud.com/player?url=' + url;
+		iframe.src = 'https://w.soundcloud.com/player/?url=' + url;
 
 		if (container) container.appendChild(iframe);
 		else {
